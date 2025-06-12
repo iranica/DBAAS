@@ -1,0 +1,42 @@
+n8n  = pronounced enay-ten
+نکته مهم n8n اجراشدنش نیست، بلکه باید در سرورهای خارجی اجرا بشه که کارآمد باشه (اکثر سرویس‌ها برای integration تحریم هستند)
+با تنظیم Syslog Server لاگ n8n را به می‌شه به ابزارهای log ارسال کرد.
+اگر در n8n از execute sql استفاده بشه احتمال sql injection داره! (راه حل هم استفاده از query parameter در بخش options)
+خود n8n برای هر Flow log ، execution ایجاد میکنه و توی دیسک فضای زیادی رو اشغال میکنه و مشکل 
+اگه با sqlite کار کنیم (یا بهش دیتابیس خاصی نداده باشیم و فقط دیسک داده باشیم) یکم migrate کردنش به postgres سخته و بهتره بیخیال flow ها شد.
+Performance:
+گرفتن SSL 
+حذف subflow ها و ادغام با Mainflow
+حذف Node های اضافی
+انتقال برخی از محاسبات به محیط Database با Function و Procedure
+گذاشتن timeout روی هر Flow برای جلوگیری از فرآیندهایی که به اتمام نمی‌رسند
+انتقال دستورات select از Master Node DB به Node standBy برای آن دسته از دیتایی که اهمیت کمتر دارد
+حذف برخی از HttpRequest ها در flow
+با دستور n8n worker —cuncurrency=5 ورکر ساخته میشه به جای Core. حالا توی لینک توضیحات بیشتری داده شده.
+
+Links
+https://community.n8n.io/t/scaling-n8n-in-kubernetes/2584 https://www.npmjs.com/package/n8n-nodes-persiandate 
+https://koak.ir
+n8n - npm search
+Monitoring by prometheus
+https://run.claw.cloud/
+https://kubarcloud.com/cloud/docs/
+https://t.me/IRn8n
+
+Experiences:
+ادعای یک شخص:
+با apache benchmark تونستیم ترافیک بیش از ۲۰ هزار درخواست در دقیقه رو با همزمانی ۳۰۰ تایی بزنیم و response time زیر ۳۰۰ میلی ثانیه بگیریم و فشاری هم به سرویس مون نیاد.
+از تکنیک worker + webhook instance استفاده کردیم که هم باید دیتابیس n8n تون در واقع postgres باشه و هم باید یک Redis اون وسط داشته باشین برای BullMQ (صف خود n8n).
+به ازای هر worker باید یک پاد بالا بیارین که به اندازه ای که دوست دارین بهش concurrency و replica بدین و اینجوری scale شدن تون دیگ به O(N) میرسه در Space Complexity و در واقع به هر میزان فشاری که داشته باشین میتونین سرویس رو ارتقا بدین.
+خلاصه این تکنیک اینه که فشار process ها از پاد اصلی برداشته میشه و به پادهای worker ها انتقال پیدا میکنه و چون اونا قابلیت concurrency هم دارن نه تنها میتونن از تمام cpu استفاده کنن بلکه چون دیسکی هم ندارن به راحتی میتونن replica داشته باشن.
+لینک منبع:
+https://docs.n8n.io/hosting/scaling/queue-mode/
+نقاط منفی داستان؟؟؟
+اگه از این روش استفاده کنین نمیتونین توی فلو هاتون از ذخیره مستقیم داده توی file system استفاده کنین و به جاش باید با minio یا s3 در واقع integrate کنین.
+اینجوری نه تنها هنگی رو احساس نمیکنین (چون پردازشی اصلا اونجا صورت نمیگیره) بلکه به راحتی میتونین scale کنین
+----------------------------------------
+
+وقت بخیر، توی n8n روشی برای تبدیل فایل وجود داره؟ من بصورت لوکال خودم با ffmpeg کار میکردم برای اینکار میخوام mp4 رو به ogg تبدیل کنم و تا جای ممکن api استفاده نکنم توی پاد n8n ـتون می‌تونید ffmpeg نصب کنید و با اجرای command باهاش تعامل کنید.
+بچه ها برای درست کردن مسیله درخواست های بالا توی n8n باید از integration با rabbit استفاده کنین.
+
+
